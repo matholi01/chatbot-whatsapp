@@ -6,4 +6,4 @@ class Evento(models.Model):
 
 
     def __str__(self):
-        return self.nome
+        return self.nome + ' | ' + self.data.strftime("%d/%m - %Hh%M")

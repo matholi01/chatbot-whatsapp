@@ -15,8 +15,9 @@ class EventoSerializer(serializers.ModelSerializer):
     def get_dia(self, obj):
         return obj.data.day
     
+    
     def get_horario(self, obj):
-        return '{hora}h{minuto}'.format(hora = obj.data.hour, minuto = obj.data.minute)
+        return obj.data.strftime("%Hh%M")
 
     # Retorna o dia da semana como um inteiro
     # 1 = Janeiro, 2 = Fevereiro ...
