@@ -1,14 +1,14 @@
-import logo from './logo.svg';
+//import logo from './logo.svg';
 import './App.css';
-import Header from './components/Header.js'
-import Linha from './components/Linha'
+import Titulo from './components/Titulo.js'
+import Eventos from './components/Eventos'
 import React from 'react';
 
 function App() {
   return (
     <React.Fragment>
-      <Header />
-      <Linha />
+      <Titulo />
+      <Eventos />
     </React.Fragment>
   );
 }

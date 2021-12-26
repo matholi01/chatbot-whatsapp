@@ -28,18 +28,18 @@ class ProgramacaoSerializer(serializers.Serializer):
     def get_mes(self, obj):
         numero_mes = obj.data.month
 
-        meses = ['Janeiro', 
-            'Fevereiro', 
-            'Março', 
-            'Abril', 
-            'Maio', 
-            'Junho', 
-            'Julho', 
-            'Agosto',
-            'Setembro', 
-            'Outubro', 
-            'Novembro', 
-            'Dezembro'
+        meses = ['JAN', 
+            'FEV', 
+            'MAR', 
+            'ABRIL', 
+            'MAIO', 
+            'JUN', 
+            'JUL', 
+            'AGO',
+            'SET', 
+            'OUT', 
+            'NOV', 
+            'DEZ'
         ]
 
         dicio_meses = {}
