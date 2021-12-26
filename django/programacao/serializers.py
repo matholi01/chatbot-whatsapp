@@ -1,75 +1,62 @@
 from rest_framework import serializers
 from .models import Evento
 
+
 class EventoSerializer(serializers.ModelSerializer):
 
-    dia_semana = serializers.SerializerMethodField('get_dia_semana')
-    mes = serializers.SerializerMethodField('get_mes')
-    dia = serializers.SerializerMethodField('get_dia')
     horario = serializers.SerializerMethodField('get_horario')
 
     class Meta:
         model = Evento 
-        fields = ('nome','dia','horario','dia_semana','mes')
-    
-    def get_dia(self, obj):
-        return obj.data.day
-    
-    
+        fields = ['nome', 'horario']
+
     def get_horario(self, obj):
         return obj.data.strftime("%Hh%M")
 
+class ProgramacaoSerializer(serializers.Serializer):
+
+    dia = serializers.SerializerMethodField('get_dia')
+    mes = serializers.SerializerMethodField('get_mes')
+    dia_semana = serializers.SerializerMethodField('get_dia_semana')
+    eventos = serializers.ListField()
+
+    def get_dia(self, obj):
+        return obj.data.day  
+    
     # Retorna o dia da semana como um inteiro
     # 1 = Janeiro, 2 = Fevereiro ...
     def get_mes(self, obj):
         numero_mes = obj.data.month
 
-        if numero_mes == 1:
-            return 'Janeiro'
-        elif numero_mes == 2:
-            return 'Fevereiro'
-        elif numero_mes == 3:
-            return 'Março'
-        elif numero_mes == 4:
-            return 'Abril'
-        elif numero_mes == 5:
-            return 'Maio'
-        elif numero_mes == 6:
-            return 'Junho'
-        elif numero_mes == 7:
-            return 'Julho'
-        elif numero_mes == 8:
-            return 'Agosto'
-        elif numero_mes == 9:
-            return 'Setembro'
-        elif numero_mes == 10:
-            return 'Outubro'
-        elif numero_mes == 11:
-            return 'Novembro'
-        elif numero_mes == 12:
-            return 'Dezembro'
-                 
+        meses = ['Janeiro', 
+            'Fevereiro', 
+            'Março', 
+            'Abril', 
+            'Maio', 
+            'Junho', 
+            'Julho', 
+            'Agosto',
+            'Setembro', 
+            'Outubro', 
+            'Novembro', 
+            'Dezembro'
+        ]
+
+        dicio_meses = {}
+        for i in range(12):
+            dicio_meses[i+1] = meses[i]
+
+        return dicio_meses[numero_mes]
     
     # Retorna o dia da semana como um inteiro
     # 1 = Segunda, 2 = Terça ...
     def get_dia_semana(self, obj):
         
-        dia_da_semana = obj.data.isocalendar()[2]
+        dia_semana = obj.data.isocalendar()[2]
+        semana = ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo']
 
-        if dia_da_semana == 1:
-            return 'Segunda'
-        elif dia_da_semana == 2:
-            return 'Terça'
-        elif dia_da_semana == 3:
-            return 'Quarta' 
-        elif dia_da_semana == 4:
-            return 'Quinta' 
-        elif dia_da_semana == 5:
-            return 'Sexta' 
-        elif dia_da_semana == 6:
-            return 'Sábado' 
-        elif dia_da_semana == 7:
-            return 'Domingo' 
+        dicio_dia_semana = {}
+        for i in range(7):
+            dicio_dia_semana[i+1] = semana[i]
 
-
-    
+        return dicio_dia_semana[dia_semana]

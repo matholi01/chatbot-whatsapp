@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -6,26 +6,43 @@ from rest_framework.decorators import api_view
 from .models import Evento
 from .serializers import *
 
+# Ajuda na modificação do retorno da requição GET
+class ProgramacaoDia:
+    def __init__(self, data, eventos):
+        # Eventos de um dia da semana de uma certa semana
+        self.eventos = eventos
+        # Data do dia da semana de uma certa semana
+        self.data = data
+
 @api_view(['GET'])
 def programacao_list(request):
     if request.method == 'GET':
-        # Lista com os eventos de um dia da semana
-        eventos_dia_semana = []
+        # Número da semana atual
+        num_semana = datetime.today().isocalendar()[1]
 
-        # Lista de eventos de um dia da semana "serializados"
-        serializer = []
+        # Eventos da semana atual 
+        eventos = Evento.objects.filter(data__week=num_semana)
 
-        # Lista com todos os eventos da semana serializados
-        resposta = []
+        # Guardará a programação completa de uma semana
+        programacao_serializada = []
 
-        # Eventos da semana atual
-        dados_semana_atual = Evento.objects.filter(data__week = datetime.today().isocalendar()[1])
-        
-        for i,n in enumerate(list(range(1,8))):
-            # Filtra a partir do número da dia da semana. Começa na segunda e termina no domingo.
-            eventos_dia_semana.append(dados_semana_atual.filter(data__week_day=n%7+1)) 
+        for i in range(1,8):
+            # Eventos do dia da semana i.
+            # 1 <= i <= 7 e significa Segunda, Terça, ..., Domingo 
+            eventos_dia = eventos.filter(data__iso_week_day=i).order_by('data')
 
-            serializer.append(EventoSerializer(eventos_dia_semana[i], context={'request': request}, many=True).data)
-            resposta.append(serializer[i])
-    
-        return Response(resposta)
+            # Se existe um evento no dia da semana i na semana atual
+            if eventos_dia.exists():
+                # Serializa os eventos
+                eventos_serializados = EventoSerializer(eventos_dia, many=True).data 
+
+                # Guarda a data do dia da semana daquela semana
+                data = eventos_dia.values('data').first().get('data')
+
+                # Utiliza um objeto para modificar o retorno da requisição GET
+                programacao_dia = ProgramacaoDia(data=data, eventos=eventos_serializados)
+
+                # Inclui na lista a programação de um dia da semana i da semana atual
+                programacao_serializada.append(ProgramacaoSerializer(programacao_dia).data)
+
+    return Response(programacao_serializada)
