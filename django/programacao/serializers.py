@@ -53,7 +53,7 @@ class ProgramacaoSerializer(serializers.Serializer):
     def get_dia_semana(self, obj):
         
         dia_semana = obj.data.isocalendar()[2]
-        semana = ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo']
+        semana = ['SEGUNDA','TERÇA','QUARTA','QUINTA','SEXTA','SÁBADO','DOMINGO']
 
         dicio_dia_semana = {}
         for i in range(7):

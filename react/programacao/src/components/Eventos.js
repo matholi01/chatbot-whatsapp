@@ -6,10 +6,12 @@ import axios from "axios";
 function getProgramacao(programacao){
     return programacao.map(programacao_dia =>
         <div>
-            <h2><b>{ programacao_dia.dia + ' ' + programacao_dia.mes}</b></h2>
-            { programacao_dia.eventos.map(evento =>
-                <li> { evento.horario + ' ' + evento.nome}</li>
-            )}
+            <h2>{ programacao_dia.dia_semana + ' • ' + programacao_dia.dia + ' ' + programacao_dia.mes}</h2>
+            <div className='lista-eventos'>
+                { programacao_dia.eventos.map(evento =>
+                    <li> { evento.horario + ' • ' + evento.nome}</li>
+                )}
+            </div>
         </div>
     )
     
