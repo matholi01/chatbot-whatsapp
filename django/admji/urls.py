@@ -19,5 +19,5 @@ from programacao import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    re_path(r'^api/programacao/$', views.programacao_list),
+    path('api/programacao/<str:igreja>/', views.programacao_list),
 ]

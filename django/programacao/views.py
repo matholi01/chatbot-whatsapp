@@ -1,9 +1,10 @@
 from datetime import date, datetime
 from django.shortcuts import render
 from rest_framework.response import Response
+from rest_framework import status
 from rest_framework.decorators import api_view
 
-from .models import Evento
+from .models import Evento, Igreja
 from .serializers import *
 
 # Ajuda na modificação do retorno da requição GET
@@ -15,13 +16,20 @@ class ProgramacaoDia:
         self.data = data
 
 @api_view(['GET'])
-def programacao_list(request):
+def programacao_list(request, igreja):
     if request.method == 'GET':
+
+        # Checa se existe uma igreja cadastrada com esse nome. Se não tiver, terminamos.
+        # iregex serve para a consulta não distinguir entre caracteres maiúsculos e minúsculos
+        if not Igreja.objects.filter(nome__iregex=igreja):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
         # Número da semana atual
         num_semana = datetime.today().isocalendar()[1]
 
-        # Eventos da semana atual 
-        eventos = Evento.objects.filter(data__week=num_semana)
+
+        # Eventos da semana atual e igreja passada como parâmetro
+        eventos = Evento.objects.filter(data__week=num_semana, igreja__nome__iregex=igreja)
 
         # Guardará a programação completa de uma semana
         programacao_serializada = []
