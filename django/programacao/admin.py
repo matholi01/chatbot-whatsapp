@@ -39,9 +39,8 @@ class Evento(admin.ModelAdmin):
     # Apenas superusuários podem criar eventos de qualquer igreja cadastrada no banco de dados
     def save_model(self, request, obj, form, change):
         if not request.user.is_superuser:
-            obj.igreja = request.user.administrador.igreja
-            super().save_model(request, obj, form, change)
-
+            obj.igreja = request.user.administrador.igreja 
+        super().save_model(request, obj, form, change)
 
 # Re-register UserAdmin
 admin.site.unregister(User)
