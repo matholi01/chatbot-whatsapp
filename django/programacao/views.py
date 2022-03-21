@@ -20,8 +20,9 @@ def programacao_list(request, igreja):
     if request.method == 'GET':
 
         # Checa se existe uma igreja cadastrada com esse nome. Se não tiver, terminamos.
-        # iregex serve para a consulta não distinguir entre caracteres maiúsculos e minúsculos
-        if not Igreja.objects.filter(nome__iregex=igreja):
+        # iexact serve para a consulta corresponder exatamente com o nome da igreja salva no Banco de dados
+        # e para não distinguir entre caracteres maiúsculos e minúsculos (Case-insensitive)
+        if not Igreja.objects.filter(nome__iexact=igreja):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         # Número da semana atual
@@ -29,7 +30,7 @@ def programacao_list(request, igreja):
 
 
         # Eventos da semana atual e igreja passada como parâmetro
-        eventos = Evento.objects.filter(data__week=num_semana, igreja__nome__iregex=igreja)
+        eventos = Evento.objects.filter(data__week=num_semana, igreja__nome__iexact=igreja)
 
         # Guardará a programação completa de uma semana
         programacao_serializada = []
