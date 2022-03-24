@@ -7,9 +7,9 @@ export default function Programacao(){
     // Pega os parâmetros passados na URL
     let params = useParams();
     return(
+        /* Passa o nome da igreja como uma propriedade. (props)*/
         <React.Fragment>
             <Titulo/>
-            // Passa "igreja" como uma propriedade (props)
             <Eventos igreja={params.igreja}/>
         </React.Fragment>
     );

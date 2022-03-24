@@ -19,6 +19,7 @@ div {
 
 h1 {
   letter-spacing: -0.06em;
+  font-size: 2.0em!important;
 }
 
 h2 {
@@ -28,14 +29,47 @@ h2 {
   margin-bottom: 0.04em!important;
 }
 
-li {
+dt {
   margin-bottom: -0.4em;
   margin-top: -0.3em;
   letter-spacing: -0.04em;
-  font-size: 1.3em!important;
+  font-size: 1.0em!important;
+  font-weight: normal!important;
 }
 
 .lista-eventos{
   margin-top: 0.5em;
   margin-bottom: 1em;
+  text-align: center;
+  font-size: 1.2em;
+}
+
+.dia-eventos{
+  border-radius: 20px;
+  border-style: solid;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border: 0.05rem solid;
+  text-align: center;
+  width: 270px;
+  margin:0 auto;
+  margin-bottom: 20px;
+  margin-top: 20px;
+  font-size: 1.3em;
+  background-color: #ffc75e;
+}
+
+.eventos{ 
+  border-radius: 20px;
+  padding-right: 5vw;
+  padding-left: 5vw;
+  padding-top: 2vw;
+  padding-bottom: 1vw;
+  margin:0 auto;
+  width: auto;
+}
+
+.titulo{
+  margin-top: 30px;
+  text-align: center;
 }
