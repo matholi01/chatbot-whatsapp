@@ -1,13 +1,13 @@
-from datetime import date, datetime
+from datetime import datetime, timedelta
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
 
-from .models import Evento, Igreja
+from .models import Evento, Igreja, Igreja
 from .serializers import *
 
-# Ajuda na modificação do retorno da requição GET
+# Ajuda na serialização. Também modifica o retorno da requisição GET.
 class ProgramacaoDia:
     def __init__(self, data, eventos):
         # Eventos de um dia da semana de uma certa semana
@@ -15,19 +15,31 @@ class ProgramacaoDia:
         # Data do dia da semana de uma certa semana
         self.data = data
 
+# Ajuda na serialização. Também modifica o retorno da requisição GET.
+class ProgramacaoSemanal:
+    def __init__(self, programacao, data_hoje, igreja):
+        # Eventos de uma programação semanal
+        self.programacao = programacao
+        # Data de hoje
+        self.data_hoje = data_hoje
+        # Nome da igreja
+        self.igreja = igreja
+
 @api_view(['GET'])
 def programacao_list(request, igreja):
     if request.method == 'GET':
 
+        # Como não há nomes de igrejas duplicados, pegamos o primeiro elemento da consulta
+        nome_igreja = Igreja.objects.filter(nome__iexact=igreja).first()
+
         # Checa se existe uma igreja cadastrada com esse nome. Se não tiver, terminamos.
         # iexact serve para a consulta corresponder exatamente com o nome da igreja salva no Banco de dados
         # e para não distinguir entre caracteres maiúsculos e minúsculos (Case-insensitive)
-        if not Igreja.objects.filter(nome__iexact=igreja):
+        if not nome_igreja:
             return Response(status=status.HTTP_404_NOT_FOUND)
-
+        
         # Número da semana atual
         num_semana = datetime.today().isocalendar()[1]
-
 
         # Eventos da semana atual e igreja passada como parâmetro
         eventos = Evento.objects.filter(data__week=num_semana, igreja__nome__iexact=igreja)
@@ -54,4 +66,9 @@ def programacao_list(request, igreja):
                 # Inclui na lista a programação de um dia da semana i da semana atual
                 programacao_serializada.append(ProgramacaoSerializer(programacao_dia).data)
 
-    return Response(programacao_serializada)
+
+        hoje = datetime.today().date()
+        # Contém todos os dados da programação semanal atual
+        programacao_semanal = ProgramacaoSemanal(data_hoje=hoje, programacao=programacao_serializada, igreja=nome_igreja)
+
+    return Response(ProgramacaoSemanalSerializer(programacao_semanal).data)
