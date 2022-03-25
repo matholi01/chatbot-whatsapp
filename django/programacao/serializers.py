@@ -4,27 +4,18 @@ from .models import Evento
 
 # Retorna o formato de data estabelecido pelo desenvolvedor
 def get_data_modificada(data):
+    # Número do mês. Janeiro: 1, Fevereiro: 2, ..., Dezembro: 12.
     numero_mes = data.month
 
-    meses = ['JAN', 
-        'FEV', 
-        'MAR', 
-        'ABRIL', 
-        'MAIO', 
-        'JUN', 
-        'JUL', 
-        'AGO',
-        'SET', 
-        'OUT', 
-        'NOV', 
-        'DEZ'
-    ]
-
-    return data.strftime("%d") + ' ' + meses[numero_mes-1]
+    # Se o mês for menor do que 0, adicionamos um 0 na frente do mês
+    # por questão de design no front-end.
+    if numero_mes > 10:
+        return data.strftime("%d") + '.' + str(numero_mes)
+    else:
+        return data.strftime("%d") + '.' + '0' + str(numero_mes)
 
 
 class EventoSerializer(serializers.ModelSerializer):
-
     horario = serializers.SerializerMethodField('get_horario')
 
     class Meta:
@@ -73,15 +64,18 @@ class ProgramacaoSemanalSerializer(serializers.Serializer):
     # Lista de todos os eventos da programação
     programacao = serializers.ListField()
 
+    # Calcula o domingo de uma programação semanal específica
     def get_domingo(self, obj):
         ultimo_dia = obj.data_hoje + timedelta(days=-obj.data_hoje.weekday() + 6)
         return  get_data_modificada(ultimo_dia)
 
+    # Calcula a segunda de uma programação semanal específica
     def get_segunda(self, obj):
         primeiro_dia = obj.data_hoje + timedelta(days=-obj.data_hoje.weekday())
         return get_data_modificada(primeiro_dia)
     
+    # Retorno o nome da igreja em maiúsculo.
     def get_igreja(self, obj):
-        return str(obj.igreja)
+        return str(obj.igreja).upper()
     
         

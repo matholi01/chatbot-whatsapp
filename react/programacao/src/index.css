@@ -17,19 +17,20 @@ div {
   margin-bottom: 3px;
 }
 
-h1 {
+.titulo {
   letter-spacing: -0.06em;
   font-size: 2.0em!important;
 }
 
-h2 {
-  font-weight: bold!important;
+/*Período da programação semanal*/
+.periodo {
   font-size: 1.3em!important;
   letter-spacing: -0.06em; 
   margin-bottom: 0.04em!important;
 }
 
-dt {
+/*Representa o conteúdo de cada evento*/
+.evento {
   margin-bottom: -0.4em;
   margin-top: -0.3em;
   letter-spacing: -0.04em;
@@ -37,39 +38,93 @@ dt {
   font-weight: normal!important;
 }
 
+/*Lista de eventos de um dia da semana.*/
 .lista-eventos{
   margin-top: 0.5em;
   margin-bottom: 1em;
   text-align: center;
   font-size: 1.2em;
+  font-family: Montserrat-Light;
 }
 
+/*Uma dia da semana e a data deste dia.*/
 .dia-eventos{
-  border-radius: 20px;
   border-style: solid;
   padding-top: 5px;
   padding-bottom: 5px;
   border: 0.05rem solid;
   text-align: center;
-  width: 270px;
+  width: 200px;
   margin:0 auto;
   margin-bottom: 20px;
   margin-top: 20px;
-  font-size: 1.3em;
-  background-color: #ffc75e;
+  font-size: 1.1em;
+  background-color: #1b1b1b;
+  color:rgb(255, 255, 255);
+  font-family: Montserrat-Bold;
+  letter-spacing: -0.04em; 
 }
 
-.eventos{ 
+/*Conteudo da programação semanal*/
+.conteudo{ 
   border-radius: 20px;
-  padding-right: 5vw;
-  padding-left: 5vw;
   padding-top: 2vw;
   padding-bottom: 1vw;
   margin:0 auto;
   width: auto;
 }
 
-.titulo{
+/*Cabeçalho da programação*/
+.cabecalho{
+  font-size: 0.9em;
   margin-top: 30px;
   text-align: center;
+  font-family: Montserrat-Bold;
+  margin-right: 5px;
+  margin-left: 5px;
 }
+
+.divisoria{
+  border: 2px solid #1b1b1b;
+}
+
+/*Informações no cabeçalho.*/
+.info-cabecalho{
+  font-family: Montserrat-Regular;
+  font-size: 1.5em;
+  background-color: #1b1b1b;
+  color:rgb(255, 255, 255);
+  border-style: solid;
+  border: 0.05rem solid;
+  margin:0 auto;
+  width: 220px;
+  font-family: Montserrat-Bold;
+  padding: 2px;
+}
+
+/*Hora de cada evento*/
+.hora-eventos{
+  font-family: Montserrat-Regular;
+}
+
+/*Adiciona fontes*/
+@font-face {
+  font-family: "Montserrat-Black";
+  src: url("./fontes/Montserrat/Montserrat-Black.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Montserrat-Light";
+  src: url("./fontes/Montserrat/Montserrat-Light.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Montserrat-Regular";
+  src: url("./fontes/Montserrat/Montserrat-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Montserrat-Bold";
+  src: url("./fontes/Montserrat/Montserrat-Bold.ttf") format("truetype");
+}
+

@@ -1,6 +1,5 @@
 //import logo from './logo.svg';
 import './App.css';
-import Titulo from './components/Titulo.js'
 import Eventos from './components/Eventos'
 import React from 'react';
 import Programacao from './routes/programacao';
@@ -16,9 +15,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="programacao">
-          <Route path=":igreja" element={<Programacao/>}/> 
-        </Route>
+        <Route path="programacao/:igreja" element={<Programacao/>}/>
       </Routes>
     </BrowserRouter>
   );
