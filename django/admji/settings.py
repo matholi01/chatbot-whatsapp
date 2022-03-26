@@ -13,11 +13,21 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 from os import path
 
-#CORS_ORIGIN_ALLOW_ALL = True
+# Para o deploy
+import django_on_heroku
+import dotenv
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Para o deploy
+dotenv_file = path.join(BASE_DIR, ".env")
+if path.isfile(dotenv_file):
+    dotenv.load_dotenv(dotenv_file)
+
+DATABASES = {}
+DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -28,7 +38,7 @@ SECRET_KEY = 'django-insecure-m#citqr2+#+#04h_hzn9(i)+a@pj1%1c9c0&od*p80q0i%6b+@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['programacao-admji.herokuapp.com','127.0.0.1:8000', 'localhost']
 
 # Importante para usar a API através do 'localhost'
 CORS_ORIGIN_ALLOW_ALL = True
@@ -50,6 +60,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Para o deploy
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -64,7 +75,7 @@ ROOT_URLCONF = 'admji.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [path.join(BASE_DIR, '../react/programacao/build')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -127,12 +138,24 @@ USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
-STATIC_ROOT = path.join(BASE_DIR, 'static')
-
+STATIC_ROOT = path.join(BASE_DIR, 'staticfiles')
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    # Local dos arquivos estáticos do React
+    path.join(BASE_DIR, '../react/programacao/build/static')
+]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Para o deploy
+django_on_heroku.settings(locals())
+options = DATABASES['default'].get('OPTIONS', {})
+options.pop('sslmode', None)
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
