@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
 
-from .models import Evento, Igreja, Igreja
+from .models import Evento, Igreja
 from .serializers import *
 
 # Ajuda na serialização. Também modifica o retorno da requisição GET.
@@ -30,13 +30,20 @@ def programacao_list(request, igreja):
     if request.method == 'GET':
 
         # Como não há nomes de igrejas duplicados, pegamos o primeiro elemento da consulta
-        nome_igreja = Igreja.objects.filter(nome__iexact=igreja).first()
-
-        # Checa se existe uma igreja cadastrada com esse nome. Se não tiver, terminamos.
         # iexact serve para a consulta corresponder exatamente com o nome da igreja salva no Banco de dados
         # e para não distinguir entre caracteres maiúsculos e minúsculos (Case-insensitive)
+        nome_igreja = Igreja.objects.filter(nome__iexact=igreja).first()
+        nome_igreja_normalizado = Igreja.objects.filter(nome_normalizado__iexact=igreja).first()
+
+        # Checa se existe uma igreja cadastrada com o nome passado na URL da API.
         if not nome_igreja:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            # Se não tiver, checamos no campo especial,
+            # pois o usuário pode ter passado o nome da igreja na URL sem espaços e apenas com caracteres ASCII
+            if nome_igreja_normalizado:
+                # Caso haja o nome normalizado, trabalhamos com este
+                nome_igreja = nome_igreja_normalizado
+            else:
+                return Response(status=status.HTTP_404_NOT_FOUND)
         
         # Número da semana atual
         num_semana = datetime.today().isocalendar()[1]

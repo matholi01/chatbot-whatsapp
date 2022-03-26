@@ -18,7 +18,7 @@ class UserAdmin(BaseUserAdmin):
     inlines = (AdministradorInline,) 
 
 @admin.register(Evento)
-class Evento(admin.ModelAdmin):
+class EventoAdmin(admin.ModelAdmin):
 
     # Filtra os eventos mostrados na página do admin do django
     def get_queryset(self, request):
@@ -41,6 +41,7 @@ class Evento(admin.ModelAdmin):
         if not request.user.is_superuser:
             obj.igreja = request.user.administrador.igreja 
         super().save_model(request, obj, form, change)
+    
 
 # Re-register UserAdmin
 admin.site.unregister(User)

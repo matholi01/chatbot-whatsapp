@@ -1,14 +1,33 @@
 from django.db import models
 from django.contrib.auth.models import User
+import unicodedata
 
 # Representa uma igreja do campus ADMJI
 class Igreja(models.Model):
     # Duas igrejas não podem ter o mesmo nome, por isso o campo "nome" é uma chave primária.
     nome = models.CharField('Nome', max_length=50, primary_key=True,
     help_text='Nome da igreja. Pode ser um nome simbólico que faça sentido, como por exemplo "Matriz".')
+    # Campo que guarda o nome da igreja utilizando apenas caracteres ASCII e sem espaços em branco.
+    nome_normalizado = models.CharField(max_length=50,blank=True,unique=True, editable=False)
 
     def __str__(self):
         return self.nome
+
+    def save(self, *args, **kwargs):
+
+        # Testa se o nome da igreja possui acentos ou caracteres que não estão na tabela ASCII, como o "ç"
+        if self.nome.encode('ascii','ignore').decode('ascii','ignore') != self.nome:
+            # Se houver caracteres que não estão na tabela ASCII, utilizamos 
+            # o campo especial para guardar o nome com os caracteres substituídos 
+            # por caracteres da tabela ASCII.
+            self.nome_normalizado = unicodedata.normalize('NFKD', self.nome).encode('ascii', 'ignore').decode('utf8')
+
+        # Retira os espaços em branco do nome caso tenha e salva no campo especial
+        if ' ' in self.nome_normalizado:
+            self.nome_normalizado = self.nome_normalizado.replace(' ','')
+
+        return super().save(*args, **kwargs)
+
 
 # Representa um evento na programação
 class Evento(models.Model):
