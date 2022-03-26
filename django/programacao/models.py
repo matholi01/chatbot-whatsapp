@@ -8,7 +8,7 @@ class Igreja(models.Model):
     nome = models.CharField('Nome', max_length=50, primary_key=True,
     help_text='Nome da igreja. Pode ser um nome simbólico que faça sentido, como por exemplo "Matriz".')
     # Campo que guarda o nome da igreja utilizando apenas caracteres ASCII e sem espaços em branco.
-    nome_normalizado = models.CharField(max_length=50,blank=True,unique=True, editable=False)
+    nome_normalizado = models.CharField(max_length=50,blank=True, editable=False)
 
     def __str__(self):
         return self.nome

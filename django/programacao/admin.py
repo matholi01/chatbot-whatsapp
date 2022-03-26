@@ -22,7 +22,7 @@ class EventoAdmin(admin.ModelAdmin):
 
     # Filtra os eventos mostrados na página do admin do django
     def get_queryset(self, request):
-        qs = super(Evento,self).get_queryset(request)
+        qs = super(EventoAdmin,self).get_queryset(request)
         # Se o usuário logado for um superusuário, retornamos todos os eventos cadastrados
         if request.user.is_superuser:
             return qs
@@ -41,6 +41,8 @@ class EventoAdmin(admin.ModelAdmin):
         if not request.user.is_superuser:
             obj.igreja = request.user.administrador.igreja 
         super().save_model(request, obj, form, change)
+    
+    search_fields = ['nome','data','igreja__nome']
     
 
 # Re-register UserAdmin
