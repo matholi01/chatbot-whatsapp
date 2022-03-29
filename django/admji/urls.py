@@ -17,7 +17,11 @@ from django.contrib import admin
 from django.urls import path
 from programacao import views
 
+from .views import index
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/programacao/<str:igreja>/', views.programacao_list),
+    # Resolvido por React Router. Deve ficar em último.
+    path('<path:route>', index, name='index'),
 ]

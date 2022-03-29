@@ -38,7 +38,7 @@ class Eventos extends Component{
     componentDidMount() {
 
         // URL da api 
-        let api_url = "http://localhost:8000/api/programacao/" + this.props.igreja + "/";
+        let api_url = "http://127.0.0.1:8000/api/programacao/" + this.props.igreja + "/";
         
         // Faz a requisição e seta o status com os dados da programação
         axios.get(api_url).then(res => this.setState({
@@ -51,6 +51,9 @@ class Eventos extends Component{
 
         /*axios.get(api_url).then(res => console.log(res.data))
         .catch(error => console.error(error))*/
+
+        // Deixa o fundo da cor desejada
+        document.body.style.backgroundColor = "#1b1b1b"
     }
 
     render(){

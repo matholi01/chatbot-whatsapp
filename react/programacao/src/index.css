@@ -20,6 +20,7 @@ div {
 .titulo {
   letter-spacing: -0.06em;
   font-size: 2.0em!important;
+  margin-bottom: 10px;
 }
 
 /*Período da programação semanal*/
@@ -57,9 +58,9 @@ div {
   width: 200px;
   margin:0 auto;
   margin-bottom: 20px;
-  margin-top: 20px;
+  
   font-size: 1.1em;
-  background-color: #1b1b1b;
+  background-color: #ff9900;
   color:rgb(255, 255, 255);
   font-family: Montserrat-Bold;
   letter-spacing: -0.04em; 
@@ -67,12 +68,19 @@ div {
 
 /*Conteudo da programação semanal*/
 .conteudo{ 
+  width: 300px;
+  border: 0.5px solid;
   border-radius: 20px;
-  padding-top: 2vw;
-  padding-bottom: 1vw;
-  margin:0 auto;
-  width: auto;
-}
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  background-color: #ffffff;
+  width: 700px;
+  max-width: 90%;
+  margin: 25px auto;
+  
+;}
 
 /*Cabeçalho da programação*/
 .cabecalho{
@@ -85,21 +93,19 @@ div {
 }
 
 .divisoria{
-  border: 2px solid #1b1b1b;
+  border-top: 3px solid #ff9900;
 }
 
 /*Informações no cabeçalho.*/
-.info-cabecalho{
-  font-family: Montserrat-Regular;
+.info-cabecalho{  
   font-size: 1.5em;
   background-color: #1b1b1b;
-  color:rgb(255, 255, 255);
-  border-style: solid;
-  border: 0.05rem solid;
+  color:#ff9900;
   margin:0 auto;
   width: 220px;
   font-family: Montserrat-Bold;
   padding: 2px;
+  margin-bottom: 5px;
 }
 
 /*Hora de cada evento*/
@@ -128,3 +134,11 @@ div {
   src: url("./fontes/Montserrat/Montserrat-Bold.ttf") format("truetype");
 }
 
+/*html{
+  background-color: black;
+}
+
+div#root{
+  background-color: #492222;
+  height: auto;
+}*/
