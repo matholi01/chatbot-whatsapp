@@ -29,4 +29,4 @@ environments/
 .env
 .venv/
 
-chaves/
+token.json
