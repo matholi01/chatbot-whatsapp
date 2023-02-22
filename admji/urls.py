@@ -21,7 +21,8 @@ from .views import index
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/programacao/<str:igreja>/', views.programacao_list),
+    path('api/programacao/', views.programacao_list),
+     path('api/programacao/mensagem/', views.programacao_mensagem),
     # Resolvido por React Router. Deve ficar em último.
     path('<path:route>', index, name='index'),
 ]

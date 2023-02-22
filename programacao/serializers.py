@@ -53,29 +53,26 @@ class ProgramacaoSerializer(serializers.Serializer):
 
 
 class ProgramacaoSemanalSerializer(serializers.Serializer):
-    # Nome da igreja daquela programação semanal
-    igreja = serializers.SerializerMethodField('get_igreja')
-
-    # Primeiro e último dia de uma programação semanal específica, 
-    # ou seja, a segunda e o domingo da próxima semana referente a programação atual. 
-    primeiro_dia = serializers.SerializerMethodField('get_segunda')
-    ultimo_dia = serializers.SerializerMethodField('get_domingo')
-
+    
     # Lista de todos os eventos da programação
     programacao = serializers.ListField()
+    domingo = serializers.CharField()
+    segunda = serializers.CharField()
+    igreja = serializers.CharField()
 
     # Calcula o domingo de uma programação semanal específica
-    def get_domingo(self, obj):
-        ultimo_dia = obj.data_hoje + timedelta(days=-obj.data_hoje.weekday() + 6)
-        return  get_data_modificada(ultimo_dia)
+    # def get_domingo(self, obj):
+    #     ultimo_dia = obj.data_hoje + timedelta(days=-obj.data_hoje.weekday() + 6)
+    #     return  get_data_modificada(ultimo_dia)
 
-    # Calcula a segunda de uma programação semanal específica
-    def get_segunda(self, obj):
-        primeiro_dia = obj.data_hoje + timedelta(days=-obj.data_hoje.weekday())
-        return get_data_modificada(primeiro_dia)
+    # # Calcula a segunda de uma programação semanal específica
+    # def get_segunda(self, obj):
+    #     primeiro_dia = obj.data_hoje + timedelta(days=-obj.data_hoje.weekday())
+    #     return get_data_modificada(primeiro_dia)
     
-    # Retorno o nome da igreja em maiúsculo.
-    def get_igreja(self, obj):
-        return str(obj.igreja).upper()
+    # # Retorno o nome da igreja em maiúsculo.
+    # def get_igreja(self, obj):
+    #     return str(obj.igreja).upper()
     
-        
+class ProgramacaoSemanalMensagemSerializer(serializers.Serializer):
+    mensagem = serializers.CharField()

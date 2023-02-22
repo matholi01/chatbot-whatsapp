@@ -7,6 +7,8 @@ from rest_framework.decorators import api_view
 from .models import Evento, Igreja
 from .serializers import *
 
+from .api import *
+
 # Ajuda na serialização. Também modifica o retorno da requisição GET.
 class ProgramacaoDia:
     def __init__(self, data, eventos):
@@ -26,56 +28,24 @@ class ProgramacaoSemanal:
         self.igreja = igreja
 
 @api_view(['GET'])
-def programacao_list(request, igreja):
-    if request.method == 'GET':
+def programacao_list(request):
+    return Response(ProgramacaoSemanalSerializer(get_programacao_semana_atual()).data)
+    
+@api_view(['POST'])
+def programacao_mensagem(request):
+    programacao_semanal = get_programacao_semana_atual()
+    todos_eventos = programacao_semanal['programacao']
+    mensagem = "PROGRAMAÇÃO SEMANAL\n" + programacao_semanal['segunda'] + ' à ' + programacao_semanal['domingo'] + '\n\n'
 
-        # Como não há nomes de igrejas duplicados, pegamos o primeiro elemento da consulta
-        # iexact serve para a consulta corresponder exatamente com o nome da igreja salva no Banco de dados
-        # e para não distinguir entre caracteres maiúsculos e minúsculos (Case-insensitive)
-        nome_igreja = Igreja.objects.filter(nome__iexact=igreja).first()
-        nome_igreja_normalizado = Igreja.objects.filter(nome_normalizado__iexact=igreja).first()
-
-        # Checa se existe uma igreja cadastrada com o nome passado na URL da API.
-        if not nome_igreja:
-            # Se não tiver, checamos no campo especial,
-            # pois o usuário pode ter passado o nome da igreja na URL sem espaços e apenas com caracteres ASCII
-            if nome_igreja_normalizado:
-                # Caso haja o nome normalizado, trabalhamos com este
-                nome_igreja = nome_igreja_normalizado
-            else:
-                return Response(status=status.HTTP_404_NOT_FOUND)
-        
-        # Número da semana atual
-        num_semana = datetime.today().isocalendar()[1]
-
-        # Eventos da semana atual e igreja passada como parâmetro
-        eventos = Evento.objects.filter(data__week=num_semana, igreja__nome__iexact=igreja)
-
-        # Guardará a programação completa de uma semana
-        programacao_serializada = []
-
-        for i in range(1,8):
-            # Eventos do dia da semana i.
-            # 1 <= i <= 7 e significa Segunda, Terça, ..., Domingo 
-            eventos_dia = eventos.filter(data__iso_week_day=i).order_by('data')
-
-            # Se existe um evento no dia da semana i na semana atual
-            if eventos_dia.exists():
-                # Serializa os eventos
-                eventos_serializados = EventoSerializer(eventos_dia, many=True).data 
-
-                # Guarda a data do dia da semana daquela semana
-                data = eventos_dia.values('data').first().get('data')
-
-                # Utiliza um objeto para modificar o retorno da requisição GET
-                programacao_dia = ProgramacaoDia(data=data, eventos=eventos_serializados)
-
-                # Inclui na lista a programação de um dia da semana i da semana atual
-                programacao_serializada.append(ProgramacaoSerializer(programacao_dia).data)
+    for eventos in todos_eventos:
+        mensagem = mensagem + eventos['dia_semana'] + ', ' + eventos['data'] + '\n'
+        if len(eventos['eventos']) == 0:
+            mensagem = mensagem + 'Não há programação.' + '\n\n'
+        else:
+            for evento in eventos['eventos']:
+                mensagem = mensagem + '*' + evento['horario'] + '*' + ': ' + evento['nome'] + '\n'
+            mensagem = mensagem + '\n'
 
 
-        hoje = datetime.today().date()
-        # Contém todos os dados da programação semanal atual
-        programacao_semanal = ProgramacaoSemanal(data_hoje=hoje, programacao=programacao_serializada, igreja=nome_igreja)
-
-    return Response(ProgramacaoSemanalSerializer(programacao_semanal).data)
+    resultado = {'mensagem': mensagem}
+    return Response(ProgramacaoSemanalMensagemSerializer(resultado).data)
