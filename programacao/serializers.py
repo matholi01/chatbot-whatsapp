@@ -1,6 +1,6 @@
 from datetime import timedelta
 from rest_framework import serializers
-from .models import Evento
+from .models import Agenda
 
 # Retorna o formato de data estabelecido pelo desenvolvedor
 def get_data_modificada(data):
@@ -15,22 +15,22 @@ def get_data_modificada(data):
         return data.strftime("%d") + '.' + '0' + str(numero_mes)
 
 
-class EventoSerializer(serializers.ModelSerializer):
-    horario = serializers.SerializerMethodField('get_horario')
+# class EventoSerializer(serializers.ModelSerializer):
+#     horario = serializers.SerializerMethodField('get_horario')
 
-    class Meta:
-        model = Evento 
-        fields = ['nome', 'horario']
+#     class Meta:
+#         model = Evento 
+#         fields = ['nome', 'horario']
 
-    # Retorna o horário em um formato estabelecido pelo desenvolvedor
-    def get_horario(self, obj):
-        data = obj.data
-        # Se for o início de uma hora x, ou seja, 0 minutos de uma hora específica,
-        # não é mostrado os minutos.
-        if data.minute == 0:
-            return obj.data.strftime("%Hh")
-        else:
-            return obj.data.strftime("%Hh%M")
+#     # Retorna o horário em um formato estabelecido pelo desenvolvedor
+#     def get_horario(self, obj):
+#         data = obj.data
+#         # Se for o início de uma hora x, ou seja, 0 minutos de uma hora específica,
+#         # não é mostrado os minutos.
+#         if data.minute == 0:
+#             return obj.data.strftime("%Hh")
+#         else:
+#             return obj.data.strftime("%Hh%M")
         
 
 class ProgramacaoSerializer(serializers.Serializer):
