@@ -56,9 +56,6 @@ class ProgramacaoSemanalSerializer(serializers.Serializer):
     
     # Lista de todos os eventos da programação
     programacao = serializers.ListField()
-    domingo = serializers.CharField()
-    segunda = serializers.CharField()
-    igreja = serializers.CharField()
 
     # Calcula o domingo de uma programação semanal específica
     # def get_domingo(self, obj):

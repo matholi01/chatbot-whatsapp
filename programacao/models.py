@@ -5,7 +5,7 @@ import unicodedata
 # Representa uma igreja do campus ADMJI
 class Agenda(models.Model):
     # Duas igrejas não podem ter o mesmo nome, por isso o campo "nome" é uma chave primária.
-    id_calendario = models.TextField('ID do Calendário', primary_key=True)
+    id_calendario = models.TextField('ID do Calendário', unique=True)
     igreja = models.CharField('Igreja', max_length=100,unique=True,
     help_text='Nome da igreja que o calendário está vinculado.')
     # Campo que guarda o nome da igreja utilizando apenas caracteres ASCII e sem espaços em branco.
