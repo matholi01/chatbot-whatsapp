@@ -22,11 +22,13 @@ class Agenda(models.Model):
             # o campo especial para guardar o nome com os caracteres substituídos 
             # por caracteres da tabela ASCII.
             self.igreja_normalizado = unicodedata.normalize('NFKD', self.igreja).encode('ascii', 'ignore').decode('utf8')
+        else:
+            self.igreja_normalizado = self.igreja
 
         # Retira os espaços em branco do nome caso tenha e salva no campo especial
         if ' ' in self.igreja_normalizado:
             self.igreja_normalizado = self.igreja_normalizado.replace(' ','')
-
+        
         return super().save(*args, **kwargs)
 
 class Administrador(models.Model):
