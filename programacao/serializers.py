@@ -71,5 +71,8 @@ class ProgramacaoSemanalSerializer(serializers.Serializer):
     # def get_igreja(self, obj):
     #     return str(obj.igreja).upper()
     
-class ProgramacaoSemanalMensagemSerializer(serializers.Serializer):
+class MensagemSerializer(serializers.Serializer):
     mensagem = serializers.CharField()
+
+class IgrejaSerializer(serializers.Serializer):
+    nome = serializers.CharField()

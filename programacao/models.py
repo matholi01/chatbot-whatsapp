@@ -2,28 +2,35 @@ from django.db import models
 from django.contrib.auth.models import User
 import unicodedata
 
+class Igreja(models.Model):
+    nome = models.CharField('Igreja', max_length=100,unique=True)
+
+    def __str__(self):
+        return self.nome
+
+
 # Representa uma igreja do campus ADMJI
 class Agenda(models.Model):
     # Duas igrejas não podem ter o mesmo nome, por isso o campo "nome" é uma chave primária.
     id_calendario = models.TextField('ID do Calendário', unique=True)
-    igreja = models.CharField('Igreja', max_length=100,unique=True,
-    help_text='Nome da igreja que o calendário está vinculado.')
+    igreja = models.OneToOneField(Igreja, on_delete=models.CASCADE)
     # Campo que guarda o nome da igreja utilizando apenas caracteres ASCII e sem espaços em branco.
     igreja_normalizado = models.CharField(max_length=100,blank=True, editable=False, unique=True)
 
     def __str__(self):
-        return self.igreja
+        return self.igreja.nome
 
     def save(self, *args, **kwargs):
 
+        igreja = self.igreja.nome
         # Testa se o nome da igreja possui acentos ou caracteres que não estão na tabela ASCII, como o "ç"
-        if self.igreja.encode('ascii','ignore').decode('ascii','ignore') != self.igreja:
+        if igreja.encode('ascii','ignore').decode('ascii','ignore') != igreja:
             # Se houver caracteres que não estão na tabela ASCII, utilizamos 
             # o campo especial para guardar o nome com os caracteres substituídos 
             # por caracteres da tabela ASCII.
-            self.igreja_normalizado = unicodedata.normalize('NFKD', self.igreja).encode('ascii', 'ignore').decode('utf8')
+            self.igreja_normalizado = unicodedata.normalize('NFKD', igreja).encode('ascii', 'ignore').decode('utf8')
         else:
-            self.igreja_normalizado = self.igreja
+            self.igreja_normalizado = igreja
 
         # Retira os espaços em branco do nome caso tenha e salva no campo especial
         if ' ' in self.igreja_normalizado:

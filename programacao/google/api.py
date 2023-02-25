@@ -8,6 +8,8 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google.oauth2 import service_account
 
+from google.auth.exceptions import MutualTLSChannelError
+
 from datetime import date, timedelta, datetime
 import pprint
 
@@ -21,7 +23,11 @@ class Calendario():
         if os.path.exists(self.FILE_PATH):
             creds = service_account.Credentials.from_service_account_file(filename=self.FILE_PATH, scopes=self.SCOPES)    
 
-        self.service = build('calendar', 'v3', credentials=creds)            
+        try:
+            self.service = build('calendar', 'v3', credentials=creds)  
+        except MutualTLSChannelError:
+            raise
+                  
         self.id_calendario = id_calendario
         self.timezone = '03:00'
    

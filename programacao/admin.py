@@ -1,10 +1,11 @@
 from django.contrib import admin
-from .models import Agenda, Administrador
+from .models import Agenda, Administrador, Igreja
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 
 # Register your models here.
 admin.site.register(Agenda) 
+admin.site.register(Igreja)
 
 # Define an inline admin descriptor for Administrador model
 # which acts a bit like a singleton
