@@ -33,23 +33,23 @@ def get_data_modificada(data):
 #             return obj.data.strftime("%Hh%M")
         
 
-class ProgramacaoSerializer(serializers.Serializer):
+# class ProgramacaoSerializer(serializers.Serializer):
 
-    data = serializers.SerializerMethodField('get_data')
-    dia_semana = serializers.SerializerMethodField('get_dia_semana')
-    eventos = serializers.ListField()
+#     data = serializers.SerializerMethodField('get_data')
+#     dia_semana = serializers.SerializerMethodField('get_dia_semana')
+#     eventos = serializers.ListField()
 
-    # Retorna a data modificada
-    def get_data(self, obj):
-        return get_data_modificada(obj.data)
+#     # Retorna a data modificada
+#     def get_data(self, obj):
+#         return get_data_modificada(obj.data)
     
-    # Retorna o dia da semana
-    def get_dia_semana(self, obj):  
-        # 1 = Segunda, 2 = Terça ...
-        dia_semana = obj.data.isocalendar()[2]
-        dias_semana = ['SEGUNDA','TERÇA','QUARTA','QUINTA','SEXTA','SÁBADO','DOMINGO']
+#     # Retorna o dia da semana
+#     def get_dia_semana(self, obj):  
+#         # 1 = Segunda, 2 = Terça ...
+#         dia_semana = obj.data.isocalendar()[2]
+#         dias_semana = ['SEGUNDA','TERÇA','QUARTA','QUINTA','SEXTA','SÁBADO','DOMINGO']
 
-        return dias_semana[dia_semana-1]
+#         return dias_semana[dia_semana-1]
 
 
 class ProgramacaoSemanalSerializer(serializers.Serializer):

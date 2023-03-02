@@ -77,7 +77,7 @@ class Calendario():
                 'eventos': []
             },
             {
-                'dia_semana': 'Terca',
+                'dia_semana': 'Terça',
                 'data': (segunda + timedelta(days=1)).strftime('%d/%m'),
                 'eventos': []
             },
@@ -119,7 +119,10 @@ class Calendario():
                 data_str = date_time.replace('-'+timezone,'')
                 data_obj = datetime.strptime(data_str, '%Y-%m-%dT%H:%M:%S')
                 dia_semana = data_obj.weekday()
-                horario = data_obj.strftime('%Hh%M')
+                if data_obj.minute == 0:
+                    horario = data_obj.strftime('%Hh')
+                else:
+                    horario = data_obj.strftime('%Hh%M')
             else:
                 data = event['start'].get('date')
                 data_str = data.replace('-'+timezone,'')

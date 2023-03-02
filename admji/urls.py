@@ -17,12 +17,11 @@ from django.contrib import admin
 from django.urls import path
 from programacao import views
 
-from .views import index
+#from .views import index
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/programacao/igreja/<int:index_alfabetico>/', views.igreja_ordem_alfabetica),
-    path('api/programacao/mensagem/igrejas/', views.igrejas_mensagem),
-    path('api/programacao/<str:semana>/<str:igreja>/', views.programacao_atual),
-    path('api/programacao/mensagem/', views.programacao_mensagem),
+    path('api/mensagem/igrejas/', views.igrejas_mensagem),
+    path('api/mensagem/programacao/<str:semana>/', views.programacao_igreja_mensagem),
+    path('api/bruto/programacao/<str:semana>/<str:igreja>/', views.programacao_igreja_bruto),
 ]
