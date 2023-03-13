@@ -35,25 +35,25 @@ class Calendario():
         hoje = datetime.now() 
         segunda = hoje - timedelta(days=hoje.weekday())
         segunda = segunda + timedelta(days=7)
-        return self.__get_programacao(segunda)
+        return self._get_programacao(segunda)
     
     def get_atual_programacao(self):
         hoje = datetime.now() 
         segunda = hoje - timedelta(days=hoje.weekday())
-        return self.__get_programacao(segunda)
+        return self._get_programacao(segunda)
 
     #Retorna a programação dada a data da segunda daquela semana
-    def __get_programacao(self,segunda):
+    def _get_programacao(self,segunda):
         segunda = segunda.replace(hour=00,minute=00,second=00)
 
         domingo = segunda + timedelta(days=6)
         domingo = domingo.replace(hour=23,minute=59,second=59)
         
-        timezone = self.timezone
-        segunda_str = str(segunda) + '-' + timezone
+        timezone_str = self.timezone
+        segunda_str = str(segunda) + '-' + timezone_str
         segunda_str = segunda_str.replace(' ', 'T')
 
-        domingo_str = str(domingo) + '-' + timezone
+        domingo_str = str(domingo) + '-' + timezone_str
         domingo_str = domingo_str.replace(' ', 'T')
 
         service = self.service
@@ -64,51 +64,70 @@ class Calendario():
                                                     singleEvents=True,
                                                     orderBy='startTime', 
                                                     timeMin=segunda_str,
-                                                    timeMax=domingo_str
+                                                    timeMax=domingo_str,
+                                                    showDeleted=True
                                                 ).execute()  
         except HttpError:
             raise
 
         events = events_result.get('items', [])
-        programacao_semanal = [
-            {
-                'dia_semana': 'Segunda',
-                'data': segunda.strftime('%d/%m'),
-                'eventos': []
-            },
-            {
-                'dia_semana': 'Terça',
-                'data': (segunda + timedelta(days=1)).strftime('%d/%m'),
-                'eventos': []
-            },
-            {
-                'dia_semana': 'Quarta',
-                'data': (segunda + timedelta(days=2)).strftime('%d/%m'),
-                'eventos': []
-            },
-            {
-                'dia_semana': 'Quinta',
-                'data': (segunda + timedelta(days=3)).strftime('%d/%m'),
-                'eventos': []
-            },
-            {
-                'dia_semana': 'Sexta',
-                'data': (segunda + timedelta(days=4)).strftime('%d/%m'),
-                'eventos': []
-            },
-            {
-                'dia_semana': 'Sábado',
-                'data': (segunda + timedelta(days=5)).strftime('%d/%m'),
-                'eventos': []
-            },
-            {
-                'dia_semana': 'Domingo',
-                'data': (segunda + timedelta(days=6)).strftime('%d/%m'),
-                'eventos': []
-            } 
-        ]
-        
+
+        programacao_semanal = {
+            'ultima_modificacao': None,
+            'programacao':[
+                {
+                    'dia_semana': 'Segunda',
+                    'data': segunda.strftime('%d/%m'),
+                    'eventos': []
+                },
+                {
+                    'dia_semana': 'Terça',
+                    'data': (segunda + timedelta(days=1)).strftime('%d/%m'),
+                    'eventos': []
+                },
+                {
+                    'dia_semana': 'Quarta',
+                    'data': (segunda + timedelta(days=2)).strftime('%d/%m'),
+                    'eventos': []
+                },
+                {
+                    'dia_semana': 'Quinta',
+                    'data': (segunda + timedelta(days=3)).strftime('%d/%m'),
+                    'eventos': []
+                },
+                {
+                    'dia_semana': 'Sexta',
+                    'data': (segunda + timedelta(days=4)).strftime('%d/%m'),
+                    'eventos': []
+                },
+                {
+                    'dia_semana': 'Sábado',
+                    'data': (segunda + timedelta(days=5)).strftime('%d/%m'),
+                    'eventos': []
+                },
+                {
+                    'dia_semana': 'Domingo',
+                    'data': (segunda + timedelta(days=6)).strftime('%d/%m'),
+                    'eventos': []
+                }
+            ] 
+        }
+
+        programacao = programacao_semanal['programacao']
+        ultima_modificacao = datetime(1, 1, 1)
+        timezone_horas = datetime.strptime(timezone_str, '%H:%M').hour
+
         for event in events:
+
+            #Seta ultima modificação na agenda
+            data_atualizacao_evento = datetime.strptime(event['updated'], '%Y-%m-%dT%H:%M:%S.%fZ') - timedelta(hours=timezone_horas)
+
+            if ultima_modificacao < data_atualizacao_evento:
+                ultima_modificacao = data_atualizacao_evento
+            
+            if event['status'] == 'cancelled':
+                continue
+
             nome = event['summary']
             date_time = event['start'].get('dateTime')
 
@@ -116,7 +135,7 @@ class Calendario():
             dia_semana = -1
 
             if date_time != None:
-                data_str = date_time.replace('-'+timezone,'')
+                data_str = date_time.replace('-'+timezone_str,'')
                 data_obj = datetime.strptime(data_str, '%Y-%m-%dT%H:%M:%S')
                 dia_semana = data_obj.weekday()
                 if data_obj.minute == 0:
@@ -125,7 +144,7 @@ class Calendario():
                     horario = data_obj.strftime('%Hh%M')
             else:
                 data = event['start'].get('date')
-                data_str = data.replace('-'+timezone,'')
+                data_str = data.replace('-'+timezone_str,'')
                 data_obj = datetime.strptime(data_str, '%Y-%m-%d')
                 dia_semana = data_obj.weekday()
                 horario = '?'
@@ -133,29 +152,29 @@ class Calendario():
             evento_obj = {'horario': horario, 'nome': nome}
 
             if dia_semana == 0:
-                segunda = programacao_semanal[dia_semana]['eventos'] 
+                segunda = programacao[dia_semana]['eventos'] 
                 segunda = segunda.append(evento_obj)
             elif dia_semana == 1:
-                segunda = programacao_semanal[dia_semana]['eventos']  
+                segunda = programacao[dia_semana]['eventos']  
                 segunda = segunda.append(evento_obj)
             elif dia_semana == 2:
-                segunda = programacao_semanal[dia_semana]['eventos']  
+                segunda = programacao[dia_semana]['eventos']  
                 segunda = segunda.append(evento_obj)
             elif dia_semana == 3:
-                segunda = programacao_semanal[dia_semana]['eventos']  
+                segunda = programacao[dia_semana]['eventos']  
                 segunda = segunda.append(evento_obj)
             elif dia_semana == 4:
-                segunda = programacao_semanal[dia_semana]['eventos']  
+                segunda = programacao[dia_semana]['eventos']  
                 segunda = segunda.append(evento_obj)
             elif dia_semana == 5:
-                segunda = programacao_semanal[dia_semana]['eventos']  
+                segunda = programacao[dia_semana]['eventos']  
                 segunda = segunda.append(evento_obj)
             elif dia_semana == 6:
-                segunda = programacao_semanal[dia_semana]['eventos']  
+                segunda = programacao[dia_semana]['eventos']  
                 segunda = segunda.append(evento_obj)
-
-        resultado = {'programacao':programacao_semanal}
-        return resultado
+        
+        programacao_semanal['ultima_modificacao'] = ultima_modificacao.strftime('%d/%m') + ' às ' + ultima_modificacao.strftime('%Hh%M')
+        return programacao_semanal
 
         
     

@@ -67,34 +67,37 @@ def programacao_igreja_mensagem(request, semana):
 
     igreja_selecionada = igrejas[i]
     agenda = Agenda.objects.filter(igreja__nome__iexact=igreja_selecionada).first()
-    programacao = []
+    programacao_semanal = {}
     try:
         calendario = Calendario(agenda.id_calendario)
         if semana == 'atual':
-            programacao = calendario.get_atual_programacao()
+            programacao_semanal = calendario.get_atual_programacao()
         elif semana == 'proxima':
-            programacao = calendario.get_proxima_programacao()
+            programacao_semanal = calendario.get_proxima_programacao()
         else:
             return Response({'erro': 'O parâmetro \'semana\' na requisição não corresponde com um nome correto.'}, status.HTTP_400_BAD_REQUEST)
     except Exception:
         return Response({'erro': 'Houve um erro ao retornar a programação semanal dessa igreja'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-    resultado = _build_mensagem_programacao(programacao, igreja_selecionada)
+    resultado = _build_mensagem_programacao(programacao_semanal, igreja_selecionada)
     return Response(MensagemSerializer(resultado).data)
 
-def _build_mensagem_programacao(programacao, igreja):
-    todos_eventos = programacao['programacao']
-    mensagem = 'Programação Semanal:\n' + '*' + igreja + '*' + '\n' + todos_eventos[0]['data'] + ' à ' + todos_eventos[6]['data'] + '\n\n'
+def _build_mensagem_programacao(programacao_semanal, igreja):
+    programacao = programacao_semanal['programacao']
+    mensagem = 'Programação Semanal\n' + '*' + igreja + '*' + '\n' + programacao[0]['data'] + ' à ' + programacao[6]['data'] + '\n\n'
 
-    for eventos in todos_eventos:
+    for eventos in programacao:
         mensagem = mensagem + '*' + eventos['dia_semana'] + '*' + ', ' + eventos['data'] + '\n'
         if not eventos['eventos']:
-            mensagem = mensagem + '_Não há programação._' + '\n\n'
+            mensagem = mensagem + '_Não há programação._' + '\n'
         else:
             for evento in eventos['eventos']:
-                mensagem = mensagem + '*' + evento['horario'] + '*' + ': ' + evento['nome'] + '\n\n'
+                mensagem = mensagem + '*' + evento['horario'] + '*' + ': ' + evento['nome'] + '\n'
+        mensagem = mensagem + '\n'
 
+    
+    mensagem = mensagem + '_Última atualização em ' + programacao_semanal['ultima_modificacao'] + '.' + '_'
     # Retira o último \n da mensagem
-    mensagem = mensagem.rstrip(mensagem[-1])
+    #mensagem = mensagem.rstrip(mensagem[-1])
     
     return {'mensagem': mensagem}
