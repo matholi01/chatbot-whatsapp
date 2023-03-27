@@ -1,5 +1,6 @@
 import datetime
 import os.path
+from os import path
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -13,10 +14,12 @@ from google.auth.exceptions import MutualTLSChannelError
 from datetime import date, timedelta, datetime
 import pprint
 
+import pathlib
 class Calendario():
+    DIR_ATUAL = pathlib.Path(__file__).parent.resolve()
 
     SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
-    FILE_PATH = '/home/matheus/Codigos/programacao-semanal-back/programacao/google/token.json'
+    FILE_PATH = path.join(DIR_ATUAL, 'token.json')
 
     def __init__(self, id_calendario):
         creds = None

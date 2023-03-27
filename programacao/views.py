@@ -3,6 +3,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from googleapiclient.errors import HttpError
 
+from django.http import HttpResponse
+
 from .models import Agenda
 from .serializers import *
 
@@ -101,3 +103,7 @@ def _build_mensagem_programacao(programacao_semanal, igreja):
     #mensagem = mensagem.rstrip(mensagem[-1])
     
     return {'mensagem': mensagem}
+
+def hello(request):
+    html = "<html><body>Hello World</body></html>"
+    return HttpResponse(html)

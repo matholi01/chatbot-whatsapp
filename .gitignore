@@ -30,3 +30,5 @@ environments/
 .venv/
 
 token.json
+
+staticfiles/

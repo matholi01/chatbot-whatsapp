@@ -20,6 +20,7 @@ from programacao import views
 #from .views import index
 
 urlpatterns = [
+    path('', views.hello),
     path('admin/', admin.site.urls),
     path('api/mensagem/igrejas/', views.igrejas_mensagem),
     path('api/mensagem/programacao/<str:semana>/', views.programacao_igreja_mensagem),
