@@ -25,10 +25,9 @@ class Calendario():
         creds = None
         if os.path.exists(self.FILE_PATH):
             creds = service_account.Credentials.from_service_account_file(filename=self.FILE_PATH, scopes=self.SCOPES)    
-
         try:
             self.service = build('calendar', 'v3', credentials=creds)  
-        except MutualTLSChannelError:
+        except Exception:
             raise
                   
         self.id_calendario = id_calendario
@@ -70,7 +69,7 @@ class Calendario():
                                                     timeMax=domingo_str,
                                                     showDeleted=True
                                                 ).execute()  
-        except HttpError:
+        except Exception:
             raise
 
         events = events_result.get('items', [])

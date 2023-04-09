@@ -31,9 +31,10 @@ def programacao_igreja_bruto(request, semana, igreja):
                             status.HTTP_400_BAD_REQUEST)
         
         return Response(ProgramacaoSemanalSerializer(programacao).data)
-    except Exception as error:
-        return Response({'erro': 'Houve um erro ao retornar a programação semanal dessa igreja'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-   
+    except Exception as erro:
+        resposta = {'erro': 'Houve um erro ao retornar a programação semanal dessa igreja', 'detalhes': str(erro)}
+        return Response(resposta, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+       
 @api_view(['POST'])
 def igrejas_mensagem(request):
     igrejas = Agenda.objects.all().order_by('igreja__nome').values_list('igreja__nome',flat=True)
@@ -78,8 +79,9 @@ def programacao_igreja_mensagem(request, semana):
             programacao_semanal = calendario.get_proxima_programacao()
         else:
             return Response({'erro': 'O parâmetro \'semana\' na requisição não corresponde com um nome correto.'}, status.HTTP_400_BAD_REQUEST)
-    except Exception:
-        return Response({'erro': 'Houve um erro ao retornar a programação semanal dessa igreja'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as erro:
+        resposta = {'erro': 'Houve um erro ao retornar a programação semanal dessa igreja', 'detalhes': str(erro)}
+        return Response(resposta, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     resultado = _build_mensagem_programacao(programacao_semanal, igreja_selecionada)
     return Response(MensagemSerializer(resultado).data)

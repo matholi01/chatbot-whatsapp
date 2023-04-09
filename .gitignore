@@ -27,8 +27,11 @@ __pycache__/
 environments/
 
 .env
+.env.prod
 .venv/
 
-token.json
-
 staticfiles/
+
+#Credenciais
+token.json
+creds.json

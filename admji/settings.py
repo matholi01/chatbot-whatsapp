@@ -13,35 +13,67 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 from os import path
 
-# Para o deploy
-import django_on_heroku
-import dotenv
-import dj_database_url
+import environ
+import io
+import os
+
+import google.auth
+from google.cloud import secretmanager
+
+from urllib.parse import urlparse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Para o deploy
-dotenv_file = path.join(BASE_DIR, ".env")
-if path.isfile(dotenv_file):
-    dotenv.load_dotenv(dotenv_file)
-
-DATABASES = {}
-DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-m#citqr2+#+#04h_hzn9(i)+a@pj1%1c9c0&od*p80q0i%6b+@'
+# SECRET_KEY = 'django-insecure-m#citqr2+#+#04h_hzn9(i)+a@pj1%1c9c0&od*p80q0i%6b+@'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['programacao-admji.herokuapp.com','127.0.0.1:8000', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 # Importante para usar a API através do 'localhost'
 CORS_ORIGIN_ALLOW_ALL = True
+
+env = environ.Env(
+    SECRET_KEY=(str, os.getenv("SECRET_KEY")),
+    DATABASE_URL=(str, os.getenv("DATABASE_URL")),
+    GS_BUCKET_NAME=(str, os.getenv("GS_BUCKET_NAME")),
+)
+
+# Attempt to load the Project ID into the environment, safely failing on error.
+try:
+    _, os.environ["GOOGLE_CLOUD_PROJECT"] = google.auth.default()
+except google.auth.exceptions.DefaultCredentialsError:
+    pass
+
+
+
+# Use local .env file in dev mode
+if os.getenv("PYTHON_ENV") == "dev":
+    DEBUG = True
+elif os.getenv("GOOGLE_CLOUD_PROJECT", None): # Use GCP secret manager in prod mode
+    project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
+
+    client = secretmanager.SecretManagerServiceClient()
+    settings_name = os.getenv("SETTINGS_NAME", "django_settings")
+    name = f"projects/{project_id}/secrets/{settings_name}/versions/latest"
+    payload = client.access_secret_version(name=name).payload.data.decode(
+        "UTF-8"
+    )
+
+    env.read_env(io.StringIO(payload))
+else:
+    raise Exception(
+        "No local .env or GOOGLE_CLOUD_PROJECT detected. No secrets found."
+    )
+
+
+SECRET_KEY = env("SECRET_KEY")
 
 
 # Application definition
@@ -56,6 +88,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'programacao',
+    'storages'
 ]
 
 MIDDLEWARE = [
@@ -74,15 +107,15 @@ ROOT_URLCONF = 'admji.urls'
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [path.join(BASE_DIR, '../react/programacao/build')],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
@@ -94,12 +127,22 @@ WSGI_APPLICATION = 'admji.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+# Database
+# Use django-environ to parse the connection string
+
+DATABASES = {"default": env.db()}
+
+# If the flag as been set, configure to use proxy
+if os.getenv("USE_CLOUD_SQL_AUTH_PROXY", None):
+    DATABASES["default"]["HOST"] = "cloudsql-proxy"
+    DATABASES["default"]["PORT"] = 5432
 
 
 # Password validation
@@ -132,9 +175,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-
 USE_TZ = False
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
@@ -142,20 +183,23 @@ STATIC_ROOT = path.join(BASE_DIR, 'staticfiles')
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [
-    # Local dos arquivos estáticos do React
-    path.join(BASE_DIR, '../react/programacao/build/static')
-]
-
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
+GS_BUCKET_NAME = env("GS_BUCKET_NAME")
+STATICFILES_DIRS = []
+DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+STATICFILES_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+GS_DEFAULT_ACL = "publicRead"
+
+# SECURITY WARNING: It's recommended that you use this when
+# running in production. The URL will be known once you first deploy
+# to Cloud Run. This code takes the URL and converts it to both these settings formats.
+CLOUDRUN_SERVICE_URL = env("CLOUDRUN_SERVICE_URL", default=None)
+if CLOUDRUN_SERVICE_URL:
+    ALLOWED_HOSTS = [urlparse(CLOUDRUN_SERVICE_URL).netloc]
+    CSRF_TRUSTED_ORIGINS = [CLOUDRUN_SERVICE_URL]
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Para o deploy
-django_on_heroku.settings(locals())
-options = DATABASES['default'].get('OPTIONS', {})
-options.pop('sslmode', None)
-
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
